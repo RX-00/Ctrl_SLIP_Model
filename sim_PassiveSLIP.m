@@ -13,6 +13,7 @@ input.d0 = .7; % Changed dDef to d0 since it's just better notation
 input.k = 9000;
 input.m = 20;
 input.g = 9.81;
+input.d_fwrd_vel = 1;
 
 % Starting conditions of the state vector x, fwrd vel, y, upwrd vel,
 % foot position upon touchdown, and what phase you're in (0 for flight, 1
@@ -34,14 +35,6 @@ optionsFlight = odeset('Events', flightEvent, 'OutputFcn', @odeplot, 'OutputSel'
     'Refine', refine);
 optionsStance = odeset('Events', stanceEvent, 'OutputFcn', @odeplot, 'OutputSel', 1, ...
     'Refine', refine);
-
-% graph stuff
-% fig = figure;
-% ax = axes;
-% ax.XLim = [0 10];
-% ax.YLim = [0 10];
-% box on
-% hold on;
 
 % time stuff
 tspan = [0 20];
@@ -75,8 +68,9 @@ while isempty(tout) || tout(end) < tend - tStep
         optionsFlight = odeset('Events', flightEvent, 'OutputFcn', @odeplot, 'OutputSel', 1, ...
     'Refine', refine);
         [t, q, te, qe, ie] = ode45(flightDyn, [tstart(end):tStep:tend], q0, optionsFlight);
-              
-        tstart = t;        
+        
+        tstart = t;
+        % forward foot placement
         q(end, 5) = q(end,1) - input.d0 * cos(input.theta); % based on chosen theta
         q(end, 6) = 1;
         q0 = q(end,:);
@@ -100,9 +94,13 @@ while isempty(tout) || tout(end) < tend - tStep
         optionsStance = odeset('Events', stanceEvent, 'OutputFcn', @odeplot, 'OutputSel', 1, ...
     'Refine', refine);
         [t, q, te, qe, ie] = ode45(stanceDyn, [tstart(end):tStep:tend], q0, optionsStance);
-        
+
         tstart = t;
         q(end, 6) = 0;
+        
+        % RAIBERT CONTROLLER
+        raibertController(q, input, t);
+        
         q0 = q(end,:);
                 
         % Accumulate output
