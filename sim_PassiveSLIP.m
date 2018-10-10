@@ -13,15 +13,15 @@ input.d0 = .7; % Changed dDef to d0 since it's just better notation
 input.k = 9000;
 input.m = 20;
 input.g = 9.81;
-input.d_fwrd_vel = 1;
+input.d_fwrd_vel = .1;
 
 % Starting conditions of the state vector x, fwrd vel, y, upwrd vel,
 % foot position upon touchdown, and what phase you're in (0 for flight, 1
 % for stance)
-q0 = [0; .0001; 1.2; 0; 0; 0];
+q0 = [0; 0; 1.2; 0; 0; 0];
 
 %-------------------------------------------------------------------- 
-% TODO: TIME TO IMPLEMENT RAIBERT CONTROLLER
+% TODO: Figure out if the controller has been implemented correctly
 %--------------------------------------------------------------------
 
 refine = 4;
@@ -97,12 +97,13 @@ while isempty(tout) || tout(end) < tend - tStep
 
         tstart = t;
         q(end, 6) = 0;
+        q0 = q(end,:);
         
         % RAIBERT CONTROLLER
-        raibertController(q, input, t);
-        
-        q0 = q(end,:);
-                
+        [xf, theta] = raibertController(q, input, t)
+        input.theta = theta;
+        q0(5) = xf;
+  
         % Accumulate output
         nt = length(t);
         tout = [tout; t(2:nt)];

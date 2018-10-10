@@ -1,4 +1,4 @@
-function [q, s] = raibertController(q, s, t)
+function [xf, theta] = raibertController(q, s, t)
 %RAIBERTCONTROLLER Simple Raibert controller for SLIP monoped
 %   This controller is called at lift off (entering flight phase)
 %   in order to adjust the leg touchdown angle to maintain
@@ -21,14 +21,12 @@ function [q, s] = raibertController(q, s, t)
         xf = xf0 + xfdelta; % where to place the foot
         
         % Find the touchdown angle
-        
+        thetaLegBody = asin(xf / s.d0);
+        theta = thetaLegBody + pi / 2;
     
     end
     
     % If the model is in stance, the controller does not need to do
-    % anything (for this SLIP model at least)
-    
-      
-    % TODO: How to return the forward ft placement and the touchdown angle
+    % anything (for this SLIP model at least)    
 end
 
