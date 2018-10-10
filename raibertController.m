@@ -6,7 +6,7 @@ function [xf, theta] = raibertController(q, s, t)
 
     % This is the feedback gain for ft displacement from neutral point
     % measured in m/(m/s), which is just s
-    k = 0.05;
+    k = .5;
     fwrd_vel = q(2);
     
     if q(end, 6) == 0 % If the model is in flight phase

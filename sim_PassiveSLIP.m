@@ -7,13 +7,13 @@ clear; close all; clc
 
 % input struct for all the chosen variables and parameters for the physics
 % equations
-input.theta = pi / 2.0001;
+input.theta = 8 * pi / 16;
 assert(input.theta < pi, 'ERROR: Touchdown theta must not be greater than pi')
 input.d0 = .7; % Changed dDef to d0 since it's just better notation
-input.k = 9000;
+input.k = 6500;
 input.m = 20;
 input.g = 9.81;
-input.d_fwrd_vel = .1;
+input.d_fwrd_vel = .001;
 
 % Starting conditions of the state vector x, fwrd vel, y, upwrd vel,
 % foot position upon touchdown, and what phase you're in (0 for flight, 1
@@ -21,8 +21,13 @@ input.d_fwrd_vel = .1;
 q0 = [0; 0; 1.2; 0; 0; 0];
 
 %-------------------------------------------------------------------- 
-% TODO: Figure out if the controller has been implemented correctly
+% TODO: Figure out how to implement the controller better 
 %--------------------------------------------------------------------
+%-------------------------------------------
+% TODO: Make the leg swing into the desired
+% touchdown angle so you can actually trust
+% the flight leg animation
+%-------------------------------------------
 
 refine = 4;
 
@@ -38,7 +43,7 @@ optionsStance = odeset('Events', stanceEvent, 'OutputFcn', @odeplot, 'OutputSel'
 
 % time stuff
 tspan = [0 20];
-tStep = 0.01;
+tStep = 0.005;
 tstart = tspan(1);
 tend = tspan(end);
 twhile = tstart; % global solution time
@@ -74,7 +79,7 @@ while isempty(tout) || tout(end) < tend - tStep
         q(end, 5) = q(end,1) - input.d0 * cos(input.theta); % based on chosen theta
         q(end, 6) = 1;
         q0 = q(end,:);
-        bounce_num = bounce_num + 1; % you can't do ++??!!
+        bounce_num = bounce_num + 1; % you can't do ++ in Matlab??!! smh
         
         % Accumulate output
         nt = length(t);
@@ -100,7 +105,7 @@ while isempty(tout) || tout(end) < tend - tStep
         q0 = q(end,:);
         
         % RAIBERT CONTROLLER
-        [xf, theta] = raibertController(q, input, t)
+        [xf, theta] = raibertController(q, input, t);
         input.theta = theta;
         q0(5) = xf;
   

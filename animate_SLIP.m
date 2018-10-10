@@ -43,13 +43,21 @@ function [] = animate_SLIP(q, s, t)
         d0 = 0.9;
         d = sqrt((x - xtd)^2 + (y)^2);
 
+        
+        %-------------------------------------------
+        % TODO: Make the leg swing into the desired
+        % touchdown angle so you can actually trust
+        % the flight leg animation
+        %-------------------------------------------
                 
-        %stanceTheta = pi - asin(y / d);
+        
+        stanceTheta = pi - asin(y / d);
         if (s.theta < pi / 2)
             inputTheta = 2 * pi - acos(y / d); % IT WORKS
         else
             inputTheta = acos(y / d); % IT WORKS
         end
+        
         %inputTheta = (pi / 2 + stanceTheta);
         % NOTE: This algorithm was originally for pitch angle of the leg
         % from the body and so in order to use it with your touchdown angle
@@ -61,6 +69,10 @@ function [] = animate_SLIP(q, s, t)
                        %q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d * [0,-1,-1,0] * cos(inputTheta)]';
         
         if(q(i, 6) == 0) % If it is in flight lift leg up and be d0
+            inputTheta = asin(xtd/s.d0);
+            
+            %FIX THIS ANIMATION LIKE MAYBE MAKE IT SWING UP TO THE CORRECT
+            %POSITION
             leg_patch.Vertices = [q(i, 1) + [0.01,0.01,-0.01,-0.01] * cos(inputTheta) + s.d0 * [0,1,1,0] * sin(inputTheta);...);
                        q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + s.d0 * [0,-1,-1,0] * cos(inputTheta)]';
         else
