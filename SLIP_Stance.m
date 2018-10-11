@@ -16,7 +16,7 @@ function dy = SLIP_Stance(t, q, s)
     ytd = 0;
   
     % Functions that describe the motion of the SLIP Model's COM
-    d = sqrt((x - xtd)^2 + (y)^2)
+    d = sqrt((x - xtd)^2 + (y)^2);
     assert(d ~= 0, 'COM distance from zero must not be zero')
     sinT = y / d;
     x0 = (s.d0 * cos(pi - s.theta));

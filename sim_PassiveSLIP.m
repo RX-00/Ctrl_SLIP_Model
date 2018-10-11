@@ -18,15 +18,13 @@ input.d_fwrd_vel = .001;
 % Starting conditions of the state vector x, fwrd vel, y, upwrd vel,
 % foot position upon touchdown, and what phase you're in (0 for flight, 1
 % for stance)
-q0 = [0; 0; 1.2; 0; 0; 0];
+q0 = [0; 1*10^-1; 1.2; 0; 0; 0];
 
 %-------------------------------------------------------------------- 
 % TODO: Figure out how to implement the controller better 
 %--------------------------------------------------------------------
 %-------------------------------------------
-% TODO: Make the leg swing into the desired
-% touchdown angle so you can actually trust
-% the flight leg animation
+% TODO: Stop slipping during stance
 %-------------------------------------------
 
 refine = 4;
@@ -76,7 +74,7 @@ while isempty(tout) || tout(end) < tend - tStep
         
         tstart = t;
         % forward foot placement
-        q(end, 5) = q(end,1) - input.d0 * cos(input.theta); % based on chosen theta
+        q(end, 5) = q(end,1) - input.d0 * cos(pi - input.theta); % based on chosen theta
         q(end, 6) = 1;
         q0 = q(end,:);
         bounce_num = bounce_num + 1; % you can't do ++ in Matlab??!! smh

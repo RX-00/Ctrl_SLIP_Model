@@ -8,6 +8,8 @@ function [xf, theta] = raibertController(q, s, t)
     % measured in m/(m/s), which is just s
     k = .5;
     fwrd_vel = q(2);
+    xf = q(end, 5);
+    theta = s.theta;
     
     if q(end, 6) == 0 % If the model is in flight phase
         
