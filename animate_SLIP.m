@@ -60,11 +60,13 @@ function [] = animate_SLIP(q, s, t)
         %leg_patch.Vertices = [q(i, 1) + [0.01,0.01,-0.01,-0.01] * cos(inputTheta) + d * [0,1,1,0] * sin(inputTheta);...);
                        %q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d * [0,-1,-1,0] * cos(inputTheta)]';
         
-        if(q(i, 6) == 1) % If it is in flight lift leg up and be d0
+        if(q(i, 6) == 1)
             inputTheta = acos(y / d);
             leg_patch.Vertices = [q(i, 1) + [0.01,0.01,-0.01,-0.01] * cos(inputTheta) + d * [0,1,1,0] * sin(inputTheta);...);
                        q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d * [0,-1,-1,0] * cos(inputTheta)]';
-        else
+            %leg_patch.Vertices = [q(i, 1) + [0.01,0.01,-0.01,-0.01] * cos(inputTheta) + d * [0,1,1,0] * sin(inputTheta);...);
+                       %q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d * [0,-1,-1,0] * cos(inputTheta)]';
+        else % If it is in flight lift leg up and be d0
             inputTheta = asin(xtd / d0);
             if(q(i, 2) < 0)
                 inputTheta = -inputTheta;
@@ -73,8 +75,7 @@ function [] = animate_SLIP(q, s, t)
                        q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d0 * [0,-1,-1,0] * cos(inputTheta)]';
         end                   
                    
-                   
-                   
+  
         ylim([-2, 2]);
         
         % Increment the screen by 0.5 m increments
