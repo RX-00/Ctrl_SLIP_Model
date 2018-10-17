@@ -23,11 +23,6 @@ q0 = [0; 1*10^-1; 1.2; 0; 0; 0];
 %-------------------------------------------------------------------- 
 % TODO: Figure out how to implement the controller better 
 %--------------------------------------------------------------------
-%---------------------------------------------
-% TODO: After finding touchdown angle
-% snap the leg to the angle during flight
-% and just hold it there
-%---------------------------------------------
 
 refine = 4;
 
@@ -43,7 +38,7 @@ optionsStance = odeset('Events', stanceEvent, 'OutputFcn', @odeplot, 'OutputSel'
 
 % time stuff
 tspan = [0 20];
-tStep = 0.01;
+tStep = 0.005;
 tstart = tspan(1);
 tend = tspan(end);
 twhile = tstart; % global solution time
@@ -106,7 +101,6 @@ while isempty(tout) || tout(end) < tend - tStep
         
         % RAIBERT CONTROLLER
         %[xf, theta] = raibertController(q, input, t);
-        %input.theta = theta;
         %q0(5) = xf;
   
         % Accumulate output

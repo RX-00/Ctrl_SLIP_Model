@@ -42,13 +42,6 @@ function [] = animate_SLIP(q, s, t)
         ytd = 0;
         d0 = s.d0;
         d = sqrt((x - xtd)^2 + (y)^2);
-
-        
-        %-------------------------------------------
-        % TODO: After finding touchdown angle
-        % snap the leg to the angle during flight
-        % and just hold it there
-        %-------------------------------------------
          
         
         % NOTE: This algorithm was originally for pitch angle of the leg
@@ -64,18 +57,11 @@ function [] = animate_SLIP(q, s, t)
             inputTheta = asin((xtd - x) / d);
             leg_patch.Vertices = [q(i, 1) + [0.01,0.01,-0.01,-0.01] * cos(inputTheta) + d * [0,1,1,0] * sin(inputTheta);...);
                        q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d * [0,-1,-1,0] * cos(inputTheta)]';
-            %leg_patch.Vertices = [q(i, 1) + [0.01,0.01,-0.01,-0.01] * cos(inputTheta) + d * [0,1,1,0] * sin(inputTheta);...);
-                       %q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d * [0,-1,-1,0] * cos(inputTheta)]';
         else % If it is in flight lift leg up and be d0
-            %assert( abs(xtd -x) < d0, "Here come some imaginary nums")
-            %inputTheta = asin((xtd - x) / d0);
             inputTheta = s.theta - (pi / 2);
             if(q(i, 2) < 0)
                 inputTheta = -inputTheta;
             end            
-            if abs(imag(q(i,1))) > 0 || abs(imag(inputTheta)) > 0
-                1+1;
-            end
             leg_patch.Vertices = [q(i, 1) + [0.01,0.01,-0.01,-0.01] * cos(inputTheta) + d0 * [0,1,1,0] * sin(inputTheta);...);
                        q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d0 * [0,-1,-1,0] * cos(inputTheta)]';
         end                   
