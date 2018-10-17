@@ -7,10 +7,10 @@ clear; close all; clc
 
 % input struct for all the chosen variables and parameters for the physics
 % equations
-input.theta = 8 * pi / 16;
+input.theta = 8.1 * pi / 16;
 assert(input.theta < pi, 'ERROR: Touchdown theta must not be greater than pi')
 input.d0 = .7; % Changed dDef to d0 since it's just better notation
-input.k = 6500;
+input.k = 7000;
 input.m = 20;
 input.g = 9.81;
 input.d_fwrd_vel = .001;
@@ -23,9 +23,11 @@ q0 = [0; 1*10^-1; 1.2; 0; 0; 0];
 %-------------------------------------------------------------------- 
 % TODO: Figure out how to implement the controller better 
 %--------------------------------------------------------------------
-%-------------------------------------------
-% TODO: Stop slipping during stance
-%-------------------------------------------
+%---------------------------------------------
+% TODO: After finding touchdown angle
+% snap the leg to the angle during flight
+% and just hold it there
+%---------------------------------------------
 
 refine = 4;
 
@@ -41,7 +43,7 @@ optionsStance = odeset('Events', stanceEvent, 'OutputFcn', @odeplot, 'OutputSel'
 
 % time stuff
 tspan = [0 20];
-tStep = 0.005;
+tStep = 0.01;
 tstart = tspan(1);
 tend = tspan(end);
 twhile = tstart; % global solution time
@@ -103,9 +105,9 @@ while isempty(tout) || tout(end) < tend - tStep
         q0 = q(end,:);
         
         % RAIBERT CONTROLLER
-        [xf, theta] = raibertController(q, input, t);
-        input.theta = theta;
-        q0(5) = xf;
+        %[xf, theta] = raibertController(q, input, t);
+        %input.theta = theta;
+        %q0(5) = xf;
   
         % Accumulate output
         nt = length(t);

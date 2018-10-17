@@ -4,7 +4,7 @@ function [] = animate_SLIP(q, s, t)
 
     figure(100); % TODO: Figure out this whole animation process thing
     cla
-    xlim([-0.5, 0.5]);
+    xlim([-3.5, 3.5]);
     ylim([-0.3, 2]);
     grid on;
     axis equal;
@@ -45,11 +45,11 @@ function [] = animate_SLIP(q, s, t)
 
         
         %-------------------------------------------
-        % TODO: Stop slipping during stance
+        % TODO: After finding touchdown angle
+        % snap the leg to the angle during flight
+        % and just hold it there
         %-------------------------------------------
          
-        inputTheta = acos(y/d);
-        theta_to = inputTheta;
         
         % NOTE: This algorithm was originally for pitch angle of the leg
         % from the body and so in order to use it with your touchdown angle
@@ -61,16 +61,21 @@ function [] = animate_SLIP(q, s, t)
                        %q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d * [0,-1,-1,0] * cos(inputTheta)]';
         
         if(q(i, 6) == 1)
-            inputTheta = acos(y / d);
+            inputTheta = asin((xtd - x) / d);
             leg_patch.Vertices = [q(i, 1) + [0.01,0.01,-0.01,-0.01] * cos(inputTheta) + d * [0,1,1,0] * sin(inputTheta);...);
                        q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d * [0,-1,-1,0] * cos(inputTheta)]';
             %leg_patch.Vertices = [q(i, 1) + [0.01,0.01,-0.01,-0.01] * cos(inputTheta) + d * [0,1,1,0] * sin(inputTheta);...);
                        %q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d * [0,-1,-1,0] * cos(inputTheta)]';
         else % If it is in flight lift leg up and be d0
-            inputTheta = asin(xtd / d0);
+            %assert( abs(xtd -x) < d0, "Here come some imaginary nums")
+            %inputTheta = asin((xtd - x) / d0);
+            inputTheta = s.theta - (pi / 2);
             if(q(i, 2) < 0)
                 inputTheta = -inputTheta;
             end            
+            if abs(imag(q(i,1))) > 0 || abs(imag(inputTheta)) > 0
+                1+1;
+            end
             leg_patch.Vertices = [q(i, 1) + [0.01,0.01,-0.01,-0.01] * cos(inputTheta) + d0 * [0,1,1,0] * sin(inputTheta);...);
                        q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d0 * [0,-1,-1,0] * cos(inputTheta)]';
         end                   
