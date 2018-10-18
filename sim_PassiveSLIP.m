@@ -13,15 +13,32 @@ input.d0 = .7; % Changed dDef to d0 since it's just better notation
 input.k = 7000;
 input.m = 20;
 input.g = 9.81;
-input.d_fwrd_vel = .001;
+input.d_fwrd_vel = 0.001;
 
 % Starting conditions of the state vector x, fwrd vel, y, upwrd vel,
 % foot position upon touchdown, and what phase you're in (0 for flight, 1
 % for stance)
-q0 = [0; 1*10^-1; 1.2; 0; 0; 0];
+q0 = [0; 0.1; 1.2; 0; 0; 0];
 
 %-------------------------------------------------------------------- 
-% TODO: Figure out how to implement the controller better 
+% TODO: How would I find the p0 of the proportional controller,
+% i.e. the controller output w/ no error
+%--------------------------------------------------------------------
+%-------------------------------------------------------------------- 
+% TODO: How to implement controller and keep the animation smooth?
+% aka keeping the xtd consistent from the projected in flight
+% of where the foot is going to hit, aka no teleporting feet
+% ---> Do I need to record theta? Since the theta is not recorded
+%      and so the animation is not taking the theta as it would be
+%      in the data, but rather the same constant end result one.
+%      ---> Is that even correct? Since when you don't update the
+%           theta with the controller everything is fine.
+%            ---> Yes, because theta is never updated in the og, look
+%                 at the animation in flight, it's based on the
+%                 constant s.theta, not derived from xtd
+% How to represent s.theta with using xtd
+% Refer to the notebook page before Lab Meeting Oct 17, 2018 Notes
+% Todo the math and figure it out
 %--------------------------------------------------------------------
 
 refine = 4;
@@ -64,7 +81,7 @@ stanceDyn = @(t, q) SLIP_Stance(t, q, input);
 bounce_num = 0;
 
 while isempty(tout) || tout(end) < tend - tStep
-    if q0(6) == 0
+    if q0(6) == 0 % The model is in flight phase
         optionsFlight = odeset('Events', flightEvent, 'OutputFcn', @odeplot, 'OutputSel', 1, ...
     'Refine', refine);
         [t, q, te, qe, ie] = ode45(flightDyn, [tstart(end):tStep:tend], q0, optionsFlight);
@@ -75,7 +92,7 @@ while isempty(tout) || tout(end) < tend - tStep
         q(end, 6) = 1;
         q0 = q(end,:);
         bounce_num = bounce_num + 1; % you can't do ++ in Matlab??!! smh
-        
+    
         % Accumulate output
         nt = length(t);
         tout = [tout; t(2:nt)];
@@ -90,7 +107,7 @@ while isempty(tout) || tout(end) < tend - tStep
             fprintf('SLIP Model has fallen (y < 0) at t = %f \n', tout(end))
             break;
         end
-    else
+    else % The model is in stance phase
         optionsStance = odeset('Events', stanceEvent, 'OutputFcn', @odeplot, 'OutputSel', 1, ...
     'Refine', refine);
         [t, q, te, qe, ie] = ode45(stanceDyn, [tstart(end):tStep:tend], q0, optionsStance);
@@ -99,10 +116,17 @@ while isempty(tout) || tout(end) < tend - tStep
         q(end, 6) = 0;
         q0 = q(end,:);
         
+        
+        % RAIBERT P CONTROLLER
+        [xf, theta] = raibertPController(q, input, t);
+        %q0(5) = xf;
+        %input.theta = theta;
+        
         % RAIBERT CONTROLLER
         %[xf, theta] = raibertController(q, input, t);
         %q0(5) = xf;
   
+
         % Accumulate output
         nt = length(t);
         tout = [tout; t(2:nt)];

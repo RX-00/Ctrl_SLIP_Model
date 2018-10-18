@@ -13,6 +13,12 @@ function [xf, theta] = raibertController(q, s, t)
     
     if q(end, 6) == 0 % If the model is in flight phase
         
+        %-------------------------------------------------------
+        % NOTE: This was an attempt to implement the controller
+        % directly, as seen from the equations. Didn't work out
+        % too well. Look at the P controller version instead.
+        %-------------------------------------------------------
+        
         % Find the foot placement
         heightOfMatrix = size(q);
         stance_amt = heightOfMatrix(1) - 1; % How much is actually in stance
