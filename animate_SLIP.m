@@ -79,7 +79,14 @@ function [] = animate_SLIP(q, s, t)
                        q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d * [0,-1,-1,0] * cos(inputTheta)]';
         else % animation for the leg in flight phase
             % NOTE: If the model is in flight phase lift leg up and be d0
-            inputTheta = s.theta - (pi / 2);
+            inputTheta = acos(round(d, 5) / round(y, 5))
+            % NOTE: When the slip model firsts starts the initial values
+            % are fine, but for some reason acos(d / y) for those initial
+            % values returns an imaginary number when it shouuld just be
+            % 0. ---> acos(1) = 0
+            if (imag(inputTheta))
+                inputTheta = 0; %NOTE: SHOULD I ROUND OR SHOULD I JUST CATCH THE FIRST INTIAL POS ERROR OF y / d ~= 1
+            end
             if (q(i, 2) < 0)
                 inputTheta = -inputTheta;
             end            

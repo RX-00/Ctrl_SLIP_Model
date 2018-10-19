@@ -92,7 +92,13 @@ while isempty(tout) || tout(end) < tend - tStep
         q(end, 6) = 1;
         q0 = q(end,:);
         bounce_num = bounce_num + 1; % you can't do ++ in Matlab??!! smh
-    
+        
+        
+        % RAIBERT CONTROLLER
+        [xf, theta] = raibertController(q, input, t);
+        q0(5) = xf;
+        
+        
         % Accumulate output
         nt = length(t);
         tout = [tout; t(2:nt)];
@@ -116,9 +122,8 @@ while isempty(tout) || tout(end) < tend - tStep
         q(end, 6) = 0;
         q0 = q(end,:);
         
-        
         % RAIBERT P CONTROLLER
-        [xf, theta] = raibertPController(q, input, t);
+        %[xf, theta] = raibertPController(q, input, t);
         %q0(5) = xf;
         %input.theta = theta;
         
