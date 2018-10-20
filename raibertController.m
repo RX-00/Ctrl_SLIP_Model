@@ -26,6 +26,7 @@ function [xf, theta] = raibertController(q, s, t)
         CG_print = fwrd_vel * Ts; % length of CG print
         xf0 = CG_print / 2; % Neutral point of the CG print
         xfdelta = k * (fwrd_vel - s.d_fwrd_vel); % displacement of ft from neutral point
+        
         xf = xf0 + xfdelta; % where to place the foot
         
         % Find the touchdown angle

@@ -4,7 +4,7 @@ function [] = animate_SLIP(q, s, t)
 
     figure(100); % TODO: Figure out this whole animation process thing
     cla
-    xlim([-3.5, 3.5]);
+    xlim([-10.5, 10.5]);
     ylim([-0.3, 2]);
     grid on;
     axis equal;
@@ -52,26 +52,7 @@ function [] = animate_SLIP(q, s, t)
         % up and down to where the leg actually is
         %leg_patch.Vertices = [q(i, 1) + [0.01,0.01,-0.01,-0.01] * cos(inputTheta) + d * [0,1,1,0] * sin(inputTheta);...);
                        %q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d * [0,-1,-1,0] * cos(inputTheta)]';
-        
-                       
-        %-------------------------------------------------------------------- 
-        % TODO: How to implement controller and keep the animation smooth?
-        % aka keeping the xtd consistent from the projected in flight
-        % of where the foot is going to hit, aka no teleporting feet
-        % ---> Do I need to record theta? Since the theta is not recorded
-        %      and so the animation is not taking the theta as it would be
-        %      in the data, but rather the same constant end result one.
-        %      ---> Is that even correct? Since when you don't update the
-        %           theta with the controller everything is fine.
-        %            ---> Yes, because theta is never updated in the og, look
-        %                 at the animation in flight, it's based on the
-        %                 constant s.theta, not derived from xtd
-        % How to represent s.theta with using xtd
-        % Refer to the notebook page before Lab Meeting Oct 17, 2018 Notes
-        % Todo the math and figure it out
-        %--------------------------------------------------------------------
-               
-                       
+
                        
         if(q(i, 6) == 1) % animation for leg in stance phase
             inputTheta = asin((xtd - x) / d);
@@ -79,7 +60,7 @@ function [] = animate_SLIP(q, s, t)
                        q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d * [0,-1,-1,0] * cos(inputTheta)]';
         else % animation for the leg in flight phase
             % NOTE: If the model is in flight phase lift leg up and be d0
-            inputTheta = acos(round(d, 5) / round(y, 5))
+            inputTheta = acos(round(d, 5) / round(y, 5));
             % NOTE: When the slip model firsts starts the initial values
             % are fine, but for some reason acos(d / y) for those initial
             % values returns an imaginary number when it shouuld just be
@@ -87,18 +68,19 @@ function [] = animate_SLIP(q, s, t)
             if (imag(inputTheta))
                 inputTheta = 0; %NOTE: SHOULD I ROUND OR SHOULD I JUST CATCH THE FIRST INTIAL POS ERROR OF y / d ~= 1
             end
-            if (q(i, 2) < 0)
+            
+            if (q(i, 2) > 0)
                 inputTheta = -inputTheta;
-            end            
+            end      
             leg_patch.Vertices = [q(i, 1) + [0.01,0.01,-0.01,-0.01] * cos(inputTheta) + d0 * [0,1,1,0] * sin(inputTheta);...);
                        q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d0 * [0,-1,-1,0] * cos(inputTheta)]';
         end                   
                    
   
-        ylim([-2, 2]);
+        ylim([-0.5, 3]);
         
         % Increment the screen by 0.5 m increments
-        %xlim([-1.5, 1.5] + round(q(i, 1) * 2) / 2);
+%         xlim([-1.5, 1.5] + round(q(i, 1) * 2) / 2);
         
         drawnow;
         %pause(0.1);
