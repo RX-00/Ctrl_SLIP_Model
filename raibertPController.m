@@ -12,10 +12,9 @@ function [xf, theta] = raibertPController(q, s, t)
     
     if q(end, 6) == 0 % If the model is in flight phase
         
-        theta = s.theta + k * (q(end, 2) - s.d_fwrd_vel);
+        theta = s.theta + k * (q(end, 2) - s.d_fwrd_vel)
         
         xf = cos(theta) / s.d0;
-       
         
     end
     

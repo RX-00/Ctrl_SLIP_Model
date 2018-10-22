@@ -24,7 +24,10 @@ function [] = animate_SLIP(q, s, t)
     
     body_patch = patch(q(1, 1) + 0.1 * sin(0: 0.1: 2 * pi), q(1, 3) + 0.1 * cos(0: 0.1: 2 * pi), [70, 216, 226]./255);
     
-    startTheta = s.theta - pi / 2;
+    startTheta = -(s.theta - pi / 2);
+    if (q(1, 2) > 0)
+        startTheta = -startTheta;
+    end
     leg_patch = patch(q(1, 1) + [0.01,0.01,-0.01,-0.01] * cos(startTheta) + s.d0 * [0,1,1,0] * sin(startTheta),...);
          q(1, 3) + [0.01,0.01,-0.01,-0.01] * sin(startTheta) + s.d0 * [0,-1,-1,0] * cos(startTheta), 'k');
 
@@ -69,6 +72,11 @@ function [] = animate_SLIP(q, s, t)
                 inputTheta = 0; %NOTE: SHOULD I ROUND OR SHOULD I JUST CATCH THE FIRST INTIAL POS ERROR OF y / d ~= 1
             end
             
+            
+            % testing purposes
+            inputTheta = -(s.theta - pi / 2);
+            
+            
             if (q(i, 2) > 0)
                 inputTheta = -inputTheta;
             end      
@@ -80,7 +88,7 @@ function [] = animate_SLIP(q, s, t)
         ylim([-0.5, 3]);
         
         % Increment the screen by 0.5 m increments
-%         xlim([-1.5, 1.5] + round(q(i, 1) * 2) / 2);
+       % xlim([-1.5, 1.5] + round(q(i, 1) * 2) / 2);
         
         drawnow;
         %pause(0.1);

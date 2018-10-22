@@ -7,13 +7,13 @@ clear; close all; clc
 
 % input struct for all the chosen variables and parameters for the physics
 % equations
-input.theta = 8.1 * pi / 16;
+input.theta = 8 * pi / 16-.1;
 assert(input.theta < pi, 'ERROR: Touchdown theta must not be greater than pi')
 input.d0 = .9; % Changed dDef to d0 since it's just better notation
 input.k = 4500;
 input.m = 20;
 input.g = 9.81;
-input.d_fwrd_vel = 1;
+input.d_fwrd_vel = 0.5;
 
 % Starting conditions of the state vector x, fwrd vel, y, upwrd vel,
 % foot position upon touchdown, and what phase you're in (0 for flight, 1
@@ -21,7 +21,9 @@ input.d_fwrd_vel = 1;
 q0 = [0; .5; 1.2; 0; 0; 0];
 
 %-------------------------------------------------------------------- 
-% TODO: Tune the 
+% TODO: Step through all the dynamics & events to make sure x touch-
+% down isn't conserved, or something other weird thing is going on
+%--------------------------------------------------------------------
 
 refine = 4;
 
@@ -36,7 +38,7 @@ optionsStance = odeset('Events', stanceEvent, 'OutputFcn', @odeplot, 'OutputSel'
     'Refine', refine);
 
 % time stuff
-tspan = [0 3];
+tspan = [0 5];
 tStep = 0.009;
 tstart = tspan(1);
 tend = tspan(end);
@@ -44,8 +46,9 @@ twhile = tstart; % global solution time
 
 tout = []; % gather up time
 qout = []; % gather up state vectors
+KEout = []; % gather up kinetic energy
+PEout = []; % gather up potential energy
 
-% These are not used yet
 teout = []; % time when events occur
 qeout = []; % state when events occur
 ieout = []; % phase which event trigger the switch
@@ -64,7 +67,7 @@ bounce_num = 0;
 
 while isempty(tout) || tout(end) < tend - tStep
     if q0(6) == 0 % The model is in flight phase until transition to stance phase is triggered       
-        
+
         optionsFlight = odeset('Events', flightEvent, 'OutputFcn', @odeplot, 'OutputSel', 1, ...
     'Refine', refine);
         [t, q, te, qe, ie] = ode45(flightDyn, [tstart(end):tStep:tend], q0, optionsFlight);
@@ -75,7 +78,7 @@ while isempty(tout) || tout(end) < tend - tStep
         q(end, 6) = 1;
         q0 = q(end,:);
         bounce_num = bounce_num + 1; % you can't do ++ in Matlab??!! smh
-        
+
         
         % Accumulate output
         nt = length(t);
@@ -101,11 +104,9 @@ while isempty(tout) || tout(end) < tend - tStep
         tstart = t;
         q(end, 6) = 0;
         q0 = q(end,:);    
-        
-        
+            
         % RAIBERT P CONTROLLER
         [xf, theta] = raibertPController(q, input, t);
-        q0(5) = xf;
         input.theta = theta;
 
         
@@ -127,6 +128,8 @@ while isempty(tout) || tout(end) < tend - tStep
     
 end
 
+
+
 plot(qout(:,1), qout(:,3));
 fprintf('Bounced %d times \n', bounce_num)
 
@@ -135,19 +138,34 @@ ylabel('height');
 title('SLIP Model COM Trajectory');
 hold off
 
-d = sqrt((qout(:, 1) - qout(:, 5)).^2 + (qout(:, 3).^2));
 
-KEout = 1 / 2 * input.m * ((qout(:, 2)).^2 + (qout(:, 4)).^2);
-PEout = input.m * input.g * qout(:, 3) +...
-        1/2 * input.k * (input.d0 - d).^2;
+% Calculate Energy in the system
+for i = 1:(length(tout)) % the last value is when the SLIP has fallen
+    if i == 141
+        1+1;
+    end
+    if(qout(i, 6) == 1) % energy in stance
+        d = sqrt((qout(i, 1) - qout(i, 5)).^2 + (qout(i, 3).^2));
+        KEout = [KEout; 1 / 2 * input.m * ((qout(i, 2)).^2 + (qout(i, 4)).^2)];
+        PEout = [PEout; input.m * input.g * qout(i, 3) + 1/2 * input.k * (input.d0 - d).^2];
+    else % energy in flight
+        KEout = [KEout; 1 / 2 * input.m * ((qout(i, 2)).^2 + (qout(i, 4)).^2)];
+        PEout = [PEout; input.m * input.g * qout(i, 3)];
+    end
+end
 
+
+% PLOT ALL OF YOUR DATA
 figure(50);
 plot(tout, KEout);
 hold on;
 plot(tout, PEout);
 hold on;
-plot(tout, PEout+KEout);
-legend('Kinetic','Potential','Total')
+plot(tout, PEout + KEout);
+for i = 1:(length(teout))
+    line([teout(i) teout(i)], [0 300]);
+end
+legend('Kinetic','Potential','Total','trigger event time');
+hold on;
 
-% PLOT ALL OF YOUR DATA
 animate_SLIP(qout, input, tout);
