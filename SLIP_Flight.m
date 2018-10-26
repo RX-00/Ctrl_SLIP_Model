@@ -15,5 +15,6 @@ function dy = SLIP_Flight(t, q, s)
     dy(4, 1) = -s.g; % y double dot
     dy(5, 1) = 0; % foot position upon touchdown
     dy(6, 1) = 0; % what phase you're in, but you don't want to set the value here or else it will be part of the integration
+    dy(7, 1) = 0; % touchdown theta
 end
 

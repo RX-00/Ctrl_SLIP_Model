@@ -74,12 +74,13 @@ function [] = animate_SLIP(q, s, t)
             
             
             % testing purposes
-            inputTheta = -(s.theta - pi / 2);
+            inputTheta = -(q(end, 7) - pi / 2);
             
             
             if (q(i, 2) > 0)
                 inputTheta = -inputTheta;
-            end      
+            end
+            
             leg_patch.Vertices = [q(i, 1) + [0.01,0.01,-0.01,-0.01] * cos(inputTheta) + d0 * [0,1,1,0] * sin(inputTheta);...);
                        q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d0 * [0,-1,-1,0] * cos(inputTheta)]';
         end                   

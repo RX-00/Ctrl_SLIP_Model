@@ -6,7 +6,7 @@ function [xf, theta] = raibertPController(q, s, t)
 
     % This is the feedback gain for ft displacement from neutral point
     % measured in m/(m/s), which is just s
-    k = -.225751;
+    k = -.12531;
     xf = 0;
     theta = 0;
     

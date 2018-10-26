@@ -7,18 +7,18 @@ clear; close all; clc
 
 % input struct for all the chosen variables and parameters for the physics
 % equations
-input.theta = 8 * pi / 16-.1;
+input.theta = 8 * pi / 16;
 assert(input.theta < pi, 'ERROR: Touchdown theta must not be greater than pi')
 input.d0 = .9; % Changed dDef to d0 since it's just better notation
 input.k = 4500;
 input.m = 20;
 input.g = 9.81;
-input.d_fwrd_vel = 0.5;
+input.d_fwrd_vel = 1;
 
 % Starting conditions of the state vector x, fwrd vel, y, upwrd vel,
 % foot position upon touchdown, and what phase you're in (0 for flight, 1
 % for stance)
-q0 = [0; .5; 1.2; 0; 0; 0];
+q0 = [0; 0; 1.2; 0; 0; 0; input.theta];
 
 %-------------------------------------------------------------------- 
 % TODO: Step through all the dynamics & events to make sure x touch-
@@ -74,10 +74,11 @@ while isempty(tout) || tout(end) < tend - tStep
         
         tstart = t;
         % forward foot placement
-        q(end, 5) = q(end,1) - input.d0 * cos(pi - input.theta); % based on chosen theta
+        %q(end, 5) = q(end,1) - input.d0 * cos(pi - input.theta); % based on chosen theta
+        q(end, 5) = q(end,1) - input.d0 * cos(pi - q(end, 7));
         q(end, 6) = 1;
         q0 = q(end,:);
-        bounce_num = bounce_num + 1; % you can't do ++ in Matlab??!! smh
+        bounce_num = bounce_num + 1;
 
         
         % Accumulate output
@@ -100,15 +101,16 @@ while isempty(tout) || tout(end) < tend - tStep
         optionsStance = odeset('Events', stanceEvent, 'OutputFcn', @odeplot, 'OutputSel', 1, ...
     'Refine', refine);
         [t, q, te, qe, ie] = ode45(stanceDyn, [tstart(end):tStep:tend], q0, optionsStance);
-
+        
         tstart = t;
         q(end, 6) = 0;
         q0 = q(end,:);    
-            
+        
         % RAIBERT P CONTROLLER
         [xf, theta] = raibertPController(q, input, t);
-        input.theta = theta;
-
+        %input.theta = theta;
+        %q0(7) = theta;
+        
         
         % Accumulate output
         nt = length(t);

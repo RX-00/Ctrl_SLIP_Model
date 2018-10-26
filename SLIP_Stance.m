@@ -19,7 +19,6 @@ function dy = SLIP_Stance(t, q, s)
     d = sqrt((x - xtd)^2 + (y)^2);
     assert(d ~= 0, 'COM distance from zero must not be zero')
     sinT = y / d;
-%     x0 = (s.d0 * cos(pi - s.theta));
     cosT = (x - xtd)/ d;
     Fs = s.k * (s.d0 - d);
     Fy = Fs * sinT;
@@ -32,4 +31,5 @@ function dy = SLIP_Stance(t, q, s)
     dy(4, 1) = (Fyt / s.m); % y double dot
     dy(5, 1) = 0; % foot position upon touchdown
     dy(6, 1) = 0; % what phase you're in, but you don't want to set the value here or else it will be part of the integration
+    dy(7, 1) = 0; % touchdown theta
 end
