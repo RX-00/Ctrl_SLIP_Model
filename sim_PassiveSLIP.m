@@ -7,18 +7,19 @@ clear; close all; clc
 
 % input struct for all the chosen variables and parameters for the physics
 % equations
-input.theta = 8 * pi / 16;
+input.theta = 90; % degrees here
+input.theta = input.theta * pi / 180; % Convert degrees to radians
 assert(input.theta < pi, 'ERROR: Touchdown theta must not be greater than pi')
-input.d0 = .9; % Changed dDef to d0 since it's just better notation
+input.d0 = .8; % Changed dDef to d0 since it's just better notation
 input.k = 4500;
 input.m = 20;
 input.g = 9.81;
-input.d_fwrd_vel = 1;
+input.d_fwrd_vel = 0.9;
 
 % Starting conditions of the state vector x, fwrd vel, y, upwrd vel,
 % foot position upon touchdown, and what phase you're in (0 for flight, 1
 % for stance)
-q0 = [0; 0; 1.2; 0; 0; 0; input.theta];
+q0 = [0; 0.1; 1.3; 0; 0; 0; input.theta];
 
 %-------------------------------------------------------------------- 
 % TODO: Step through all the dynamics & events to make sure x touch-
@@ -38,7 +39,7 @@ optionsStance = odeset('Events', stanceEvent, 'OutputFcn', @odeplot, 'OutputSel'
     'Refine', refine);
 
 % time stuff
-tspan = [0 5];
+tspan = [0 20];
 tStep = 0.009;
 tstart = tspan(1);
 tend = tspan(end);
@@ -109,7 +110,7 @@ while isempty(tout) || tout(end) < tend - tStep
         % RAIBERT P CONTROLLER
         [xf, theta] = raibertPController(q, input, t);
         %input.theta = theta;
-        %q0(7) = theta;
+        q0(7) = theta;
         
         
         % Accumulate output
@@ -131,7 +132,6 @@ while isempty(tout) || tout(end) < tend - tStep
 end
 
 
-
 plot(qout(:,1), qout(:,3));
 fprintf('Bounced %d times \n', bounce_num)
 
@@ -143,9 +143,6 @@ hold off
 
 % Calculate Energy in the system
 for i = 1:(length(tout)) % the last value is when the SLIP has fallen
-    if i == 141
-        1+1;
-    end
     if(qout(i, 6) == 1) % energy in stance
         d = sqrt((qout(i, 1) - qout(i, 5)).^2 + (qout(i, 3).^2));
         KEout = [KEout; 1 / 2 * input.m * ((qout(i, 2)).^2 + (qout(i, 4)).^2)];
@@ -167,7 +164,7 @@ plot(tout, PEout + KEout);
 for i = 1:(length(teout))
     line([teout(i) teout(i)], [0 300]);
 end
-legend('Kinetic','Potential','Total','trigger event time');
+legend('Kinetic Energy','Potential Energy','Total Energy','trigger event time');
 hold on;
 
 animate_SLIP(qout, input, tout);

@@ -62,19 +62,8 @@ function [] = animate_SLIP(q, s, t)
             leg_patch.Vertices = [q(i, 1) + [0.01,0.01,-0.01,-0.01] * cos(inputTheta) + d * [0,1,1,0] * sin(inputTheta);...);
                        q(i, 3) + [0.01,0.01,-0.01,-0.01] * sin(inputTheta) + d * [0,-1,-1,0] * cos(inputTheta)]';
         else % animation for the leg in flight phase
-            % NOTE: If the model is in flight phase lift leg up and be d0
-            inputTheta = acos(round(d, 5) / round(y, 5));
-            % NOTE: When the slip model firsts starts the initial values
-            % are fine, but for some reason acos(d / y) for those initial
-            % values returns an imaginary number when it shouuld just be
-            % 0. ---> acos(1) = 0
-            if (imag(inputTheta))
-                inputTheta = 0; %NOTE: SHOULD I ROUND OR SHOULD I JUST CATCH THE FIRST INTIAL POS ERROR OF y / d ~= 1
-            end
-            
-            
-            % testing purposes
-            inputTheta = -(q(end, 7) - pi / 2);
+
+            inputTheta = (q(i, 7) - pi / 2);           
             
             
             if (q(i, 2) > 0)
@@ -90,7 +79,9 @@ function [] = animate_SLIP(q, s, t)
         
         % Increment the screen by 0.5 m increments
        % xlim([-1.5, 1.5] + round(q(i, 1) * 2) / 2);
-        
+       
+        % other way of scrolling
+        axis([2*round(0.5*q(i,1))-2,2*round(0.5*q(i,1))+2,-0.5,2])
         drawnow;
         %pause(0.1);
     end

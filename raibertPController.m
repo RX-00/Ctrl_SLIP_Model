@@ -11,14 +11,14 @@ function [xf, theta] = raibertPController(q, s, t)
     % NOTE: for tuning the gain there's not a general "rule" for
     % approaching a number, try random numbers and then tune from the best
     % there
-    k = -0.0475432;
+    k = -0.2;
     xf = 0;
     theta = 0;
     
     if q(end, 6) == 0 % If the model is in flight phase
         
         %theta = s.theta + k * (q(end, 2) - s.d_fwrd_vel);
-        theta = q(end, 7) + k * (q(end, 2) - s.d_fwrd_vel);
+        theta = pi / 2 + k * (q(end, 2) - s.d_fwrd_vel);
         
         xf = cos(theta) / s.d0;
         
