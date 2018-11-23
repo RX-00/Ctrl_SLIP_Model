@@ -4,7 +4,7 @@ function dy = SLIP_Flight(t, q, s)
 % This is the stance phase
 % s stands for the struct of all the parameters
 %
-% q = [ x, x dot, y, y dot, ft pos, phase]
+% q = [ x, x dot, y, y dot, ft pos, phase, touchdown theta]
 % NOTE: changed the y state vector name to q just for clarity
 % Thus, in order to define x and y you must do
 % x = y(:,1), y = y(:,3)
